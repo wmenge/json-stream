@@ -53,7 +53,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
      */
     public function provideTokens()
     {
-        return Yaml::parse(__DIR__ . DIRECTORY_SEPARATOR . "fixtures" . DIRECTORY_SEPARATOR . "tokenizer.yml");
+        return Yaml::parse(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "fixtures" . DIRECTORY_SEPARATOR . "tokenizer.yml"));
     }
 
 }

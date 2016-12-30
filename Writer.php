@@ -34,11 +34,14 @@ class Writer
 
     protected $parents = array();
 
+    protected $options = 0;
+    protected $streamEmpty = true;
+
     /**
      * @param  resource                  $stream A stream resource.
      * @throws \InvalidArgumentException If $stream is not a stream resource.
      */
-    public function __construct($stream)
+    public function __construct($stream, $options = 0)
     {
         if (!is_resource($stream) || get_resource_type($stream) != 'stream') {
             throw new \InvalidArgumentException("Resource is not a stream");
@@ -46,6 +49,7 @@ class Writer
 
         $this->stream  = $stream;
         $this->context = self::CONTEXT_NONE;
+        $this->options = $options;
     }
 
     /**
@@ -171,7 +175,7 @@ class Writer
      */
     public function scalar($value)
     {
-        $this->streamWrite(json_encode($value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT));
+        $this->streamWrite(json_encode($value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | $this->options));
 
         return $this;
     }

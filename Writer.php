@@ -121,6 +121,11 @@ class Writer
      */
     public function leave()
     {
+        if (($this->options & JSON_PRETTY_PRINT) && !$this->streamEmpty && count($this->parents) > 0) {
+            $this->streamWrite(PHP_EOL);
+            $this->streamWrite(str_repeat("    ", count($this->parents) - 1));
+        }
+
         switch ($this->context) {
             case self::CONTEXT_OBJECT:
                 $this->streamWrite("}");
@@ -232,6 +237,7 @@ class Writer
     protected function streamWrite($value)
     {
         fwrite($this->stream, $value);
+        $this->streamEmpty = false;
     }
 
     /**
@@ -249,6 +255,7 @@ class Writer
     {
         $this->scalar((string) $key);
         $this->streamWrite(":");
+        if (($this->options & JSON_PRETTY_PRINT)) $this->streamWrite(' ');
     }
 
     /**
@@ -259,21 +266,44 @@ class Writer
         switch ($this->context) {
             case self::CONTEXT_OBJECT_START:
                 $this->streamWrite("{");
+
+                if (($this->options & JSON_PRETTY_PRINT)) {
+                    $this->streamWrite(PHP_EOL);
+                    $this->streamWrite(str_repeat("    ", count($this->parents)));
+                }
+
                 $this->key($key);
                 $this->context = self::CONTEXT_OBJECT;
                 break;
             case self::CONTEXT_ARRAY_START:
                 $this->streamWrite("[");
+
+                if (($this->options & JSON_PRETTY_PRINT)) {
+                    $this->streamWrite(PHP_EOL);
+                    $this->streamWrite(str_repeat("    ", count($this->parents)));
+                }
+
                 $this->context = self::CONTEXT_ARRAY;
                 break;
             case self::CONTEXT_OBJECT:
                 $this->streamWrite(',');
+                
+                if (($this->options & JSON_PRETTY_PRINT)) {
+                    $this->streamWrite(PHP_EOL);
+                    $this->streamWrite(str_repeat("    ", count($this->parents)));
+                }
+
                 $this->key($key);
                 break;
             case self::CONTEXT_ARRAY:
                 $this->streamWrite(',');
+                if (($this->options & JSON_PRETTY_PRINT)) {
+                    $this->streamWrite(PHP_EOL);
+                    $this->streamWrite(str_repeat("    ", count($this->parents)));
+                }
+
                 break;
-        }
+        }        
     }
 
 }
